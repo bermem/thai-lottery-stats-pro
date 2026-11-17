@@ -8,7 +8,7 @@
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#1a3150 0,transparent 36%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
 .wrap{max-width:1180px;margin:auto;padding:22px 16px 50px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#56d9b3,#4d8ee8);display:grid;place-items:center;color:#081321;font-weight:900;font-size:19px}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:2px}.brand h1{font-size:22px;margin:0}.sub{color:var(--muted);font-size:12px}.status{border:1px solid var(--line);padding:8px 12px;border-radius:99px;color:var(--muted);font-size:12px}
 .panel{background:linear-gradient(145deg,rgba(24,39,61,.96),rgba(15,26,43,.96));border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 12px 35px #0002}.section-title{font-size:16px;font-weight:800;margin:0 0 14px}.controls{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}select,input,button{font:inherit;border-radius:11px;border:1px solid var(--line);background:#0e192a;color:var(--text);padding:11px 12px;min-height:43px}select,input{width:100%}button{cursor:pointer;font-weight:700;background:#20344d}button.primary{background:var(--accent);color:#071820;border-color:transparent}button:disabled{opacity:.35;cursor:not-allowed}.nav{display:flex;gap:8px}.result{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.result small{color:var(--muted)}.big-number{font-size:clamp(42px,8vw,64px);font-weight:900;letter-spacing:5px;color:var(--gold);line-height:1.1}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:#0e192a;border:1px solid var(--line);border-radius:14px;padding:14px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{font-size:25px}.filters{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}.numbers{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}.num{padding:8px 2px;text-align:center;border:1px solid var(--line);border-radius:9px;background:#0d1828;font-variant-numeric:tabular-nums}.num b{display:block;font-size:14px}.num small{font-size:10px;color:var(--muted)}.num.hot{border-color:#d5a94e;background:#4a391d}.num.cold{border-color:#4c7799}.barrow{display:grid;grid-template-columns:34px 1fr 34px;gap:8px;align-items:center;margin:7px 0;font-size:12px}.bar{height:9px;border-radius:9px;background:#26364d;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#4c9be8,#57d6b0);border-radius:9px}.muted{color:var(--muted)}.note{font-size:12px;color:var(--muted)}.error{color:var(--red)}.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.hidden{display:none}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px}
-@media(max-width:650px){.controls,.filters{grid-template-columns:1fr 1fr}.controls .field{grid-column:1/-1}.filters .field:first-child{grid-column:1/-1}.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.numbers{gap:4px}.num{padding:6px 0}.num b{font-size:12px}.panel{padding:14px}}
+@media(max-width:650px){.controls{grid-template-columns:1fr}.controls .field{grid-column:auto}.nav{display:grid;grid-template-columns:1fr 1fr}.nav button{white-space:nowrap;padding:10px 8px;font-size:13px}.controls>.primary{width:100%}.filters{grid-template-columns:1fr 1fr}.filters .field:first-child{grid-column:1/-1}.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.numbers{gap:4px}.num{padding:6px 0}.num b{font-size:12px}.panel{padding:14px}.brand h1{font-size:19px}}
 </style></head>
 <body><main class="wrap">
 <header class="top"><div class="brand"><div class="logo">2D</div><div><div class="eyebrow">STATISTICS DASHBOARD</div><h1>Thai Lottery Stats PRO</h1><div class="sub">วิเคราะห์สถิติเลขท้าย 2 ตัว · 00–99</div></div></div><div class="status" id="status">กำลังเชื่อมต่อข้อมูล…</div></header>
@@ -24,11 +24,46 @@ const API='https://lotto.api.rayriffy.com';
 const $=id=>document.getElementById(id);
 let draws=[],selected=0,stats=[];
 const pad=n=>String(n).padStart(2,'0');
-function parseThaiDate(s){const m=s.match(/(\d{1,2})\s+([^\s]+)\s+(\d{4})/);if(!m)return null;const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];const mo=months.indexOf(m[2]);if(mo<0)return null;return new Date(Number(m[3])-543,mo,Number(m[1]));}
+function parseThaiDate(s){const m=s.match(/(\d{1,2})\s+([^\s]+)\s+(\d{4})/);if(!m)return null;const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];const en=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];let mo=months.indexOf(m[2]);let y=Number(m[3]);if(mo<0){mo=en.findIndex(x=>x.toLowerCase()===m[2].slice(0,3).toLowerCase());}else{y-=543;}if(mo<0)return null;return new Date(y,mo,Number(m[1]));}
 function iso(d){return d?d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()):''}
 function prizeNumber(item){const p=[...(item.prizes||[]),...(item.runningNumbers||[])].find(x=>x.id==='runningNumberBackTwo'||(x.name||'').includes('เลขท้าย 2 ตัว'));return p?.number?.[0]??null}
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
-async function load(){ $('status').textContent='กำลังโหลด…';$('message').textContent='';try{const data=await getJSON(API+'/list/1');if(data.status!=='success'||!Array.isArray(data.response))throw new Error('รูปแบบรายการงวดไม่ถูกต้อง');const list=data.response;const detail=await Promise.all(list.slice(0,1).map(async x=>{try{const d=await getJSON(API+'/lotto/'+encodeURIComponent(x.id));return {...d.response,id:x.id,date:d.response?.date||x.date,parsed:parseThaiDate(d.response?.date||x.date),number:prizeNumber(d.response||{})}}catch{return {...x,parsed:parseThaiDate(x.date),number:null}}}));draws=detail.filter(x=>x.date).map(x=>({...x,parsed:x.parsed||parseThaiDate(x.date)}));if(!draws.length)throw new Error('ไม่พบข้อมูลงวด');selected=0;renderSelect();$('status').textContent='เชื่อมต่อข้อมูลแล้ว';$('sourceNote').textContent='แหล่งข้อมูล: Rayriffy API';await loadHistory();}catch(e){$('status').textContent='เชื่อมต่อไม่สำเร็จ';$('message').textContent='โหลดข้อมูลไม่สำเร็จ: '+e.message+' · ลองกดโหลดใหม่ หรือใช้ข้อมูล API ภายหลัง';}}
+async function load(){
+ $('status').textContent='กำลังเชื่อมต่อข้อมูล…';$('message').textContent='';
+ try{
+   // Primary source: community API
+   const data=await getJSON(API+'/latest');
+   const v=data.response;
+   if(data.status!=='success'||!v) throw new Error('API ไม่ส่งผลรางวัลล่าสุด');
+   const back=(v.runningNumbers||[]).find(x=>x.id==='runningNumberBackTwo')?.number?.[0];
+   if(!back) throw new Error('ไม่พบเลขท้าย 2 ตัวในผลล่าสุด');
+   const latest={...v,id:'latest-'+v.date,parsed:parseThaiDate(v.date),number:String(back).padStart(2,'0')};
+   if(!latest.parsed) throw new Error('อ่านวันที่งวดล่าสุดไม่ได้');
+   // History archive provides the selectable historical series.
+   const archive=await getJSON('https://raw.githubusercontent.com/timpyorke/thailand-lottery-stat/main/public/draws.json');
+   const rows=Array.isArray(archive)?archive:[];
+   const mapped=rows.filter(x=>x.back2&&x.date).map(x=>({id:[x.y,x.m+1,x.d].join('-'),date:x.date,parsed:new Date(x.y,x.m,x.d),number:String(x.back2).padStart(2,'0')}));
+   const all=[latest,...mapped.filter(x=>iso(x.parsed)!==iso(latest.parsed))];
+   draws=[...new Map(all.map(x=>[iso(x.parsed),x])).values()].sort((a,b)=>b.parsed-a.parsed);
+   selected=0;renderSelect();setDefaultRange();
+   $('status').textContent='พร้อมใช้งาน · '+draws.length+' งวด';
+   $('sourceNote').textContent='ผลล่าสุด: Rayriffy API · ประวัติ: GitHub archive';
+ }catch(primaryError){
+   try{
+     // Fallback archive remains usable while the live API is unavailable.
+     const archive=await getJSON('https://raw.githubusercontent.com/timpyorke/thailand-lottery-stat/main/public/draws.json');
+     if(!Array.isArray(archive)||!archive.length)throw new Error('ไม่พบข้อมูลย้อนหลัง');
+     draws=archive.filter(x=>x.back2&&x.date).map(x=>({id:[x.y,x.m+1,x.d].join('-'),date:x.date,parsed:new Date(x.y,x.m,x.d),number:String(x.back2).padStart(2,'0')})).sort((a,b)=>b.parsed-a.parsed);
+     selected=0;renderSelect();setDefaultRange();
+     $('status').textContent='โหมดข้อมูลสำรอง · '+draws.length+' งวด';
+     $('sourceNote').textContent='ข้อมูลย้อนหลังจาก GitHub archive · ผลล่าสุดอาจยังไม่อัปเดต';
+     $('message').textContent='แหล่งผลล่าสุดขัดข้อง จึงเปลี่ยนมาใช้ฐานข้อมูลย้อนหลังอัตโนมัติ';
+   }catch(fallbackError){
+     $('status').textContent='เชื่อมต่อไม่สำเร็จ';
+     $('message').textContent='โหลดข้อมูลไม่ได้ทั้ง API หลักและฐานข้อมูลสำรอง กรุณาลองใหม่ภายหลัง';
+   }
+ }
+}
 async function loadHistory(){// ดึงงวดจากหน้ารายการย้อนหลังแบบทยอย เพื่อไม่ยิง API หนักเกินไป
 let dates=[];for(let page=1;page<=12;page++){try{const d=await getJSON(API+'/list/'+page);if(d.status!=='success'||!d.response?.length)break;dates.push(...d.response)}catch{break}}
 const unique=[...new Map(dates.map(x=>[x.id,x])).values()];const results=[];for(let i=0;i<unique.length;i++){const x=unique[i];try{const d=await getJSON(API+'/lotto/'+encodeURIComponent(x.id));const v=d.response;if(v){results.push({...v,id:x.id,parsed:parseThaiDate(v.date||x.date),number:prizeNumber(v)});}}catch{}if(i%12===11){$('status').textContent='โหลดประวัติ '+(i+1)+'/'+unique.length;}await new Promise(resolve=>setTimeout(resolve,250));}
