@@ -56,7 +56,7 @@ async function load(){
    const mapped=rows.filter(x=>x.back2&&x.date).map(x=>({id:[x.y,x.m+1,x.d].join('-'),date:x.date,parsed:new Date(x.y,x.m,x.d),number:String(x.back2).padStart(2,'0')}));
    const all=[latest,...mapped.filter(x=>iso(x.parsed)!==iso(latest.parsed))];
    draws=[...new Map(all.map(x=>[iso(x.parsed),x])).values()].sort((a,b)=>b.parsed-a.parsed);
-   selected=0;renderSelect();setDefaultRange();
+   selected=0;renderSelect();setDefaultRange();calculate();
    $('status').textContent='พร้อมใช้งาน · '+draws.length+' งวด';
    $('sourceNote').textContent='ผลล่าสุด: Rayriffy API · ประวัติ: GitHub archive';
  }catch(primaryError){
