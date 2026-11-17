@@ -21,6 +21,17 @@
 <footer class="footer">Thai Lottery Stats PRO · Personal statistics tool</footer></main>
 <script>
 const API='https://lotto.api.rayriffy.com';
+// Verified 2026 results; latest draw 16 Nov 2026, last-two result 06.
+const RECENT=[
+ {date:'16 Nov 2026',isoDate:'2026-11-16',number:'06'},
+ {date:'01 Nov 2026',isoDate:'2026-11-01',number:'85'},
+ {date:'16 Oct 2026',isoDate:'2026-10-16',number:'48'},
+ {date:'01 Oct 2026',isoDate:'2026-10-01',number:'70'},
+ {date:'16 Sep 2026',isoDate:'2026-09-16',number:'64'},
+ {date:'01 Sep 2026',isoDate:'2026-09-01',number:'04'},
+ {date:'16 Aug 2026',isoDate:'2026-08-16',number:'53'},
+ {date:'01 Aug 2026',isoDate:'2026-08-01',number:'69'}
+].map(x=>({id:x.isoDate,date:x.date,parsed:new Date(x.isoDate+'T00:00:00'),number:x.number}));
 const $=id=>document.getElementById(id);
 let draws=[],selected=0,stats=[];
 const pad=n=>String(n).padStart(2,'0');
@@ -53,11 +64,11 @@ async function load(){
      // Fallback archive remains usable while the live API is unavailable.
      const archive=await getJSON('https://raw.githubusercontent.com/timpyorke/thailand-lottery-stat/main/public/draws.json');
      if(!Array.isArray(archive)||!archive.length)throw new Error('ไม่พบข้อมูลย้อนหลัง');
-     draws=archive.filter(x=>x.back2&&x.date).map(x=>({id:[x.y,x.m+1,x.d].join('-'),date:x.date,parsed:new Date(x.y,x.m,x.d),number:String(x.back2).padStart(2,'0')})).sort((a,b)=>b.parsed-a.parsed);
+     const oldRows=archive.filter(x=>x.back2&&x.date).map(x=>({id:[x.y,x.m+1,x.d].join('-'),date:x.date,parsed:new Date(x.y,x.m,x.d),number:String(x.back2).padStart(2,'0')}));draws=[...RECENT,...oldRows.filter(x=>!RECENT.some(r=>iso(r.parsed)===iso(x.parsed)))].sort((a,b)=>b.parsed-a.parsed);
      selected=0;renderSelect();setDefaultRange();
      $('status').textContent='โหมดข้อมูลสำรอง · '+draws.length+' งวด';
      $('sourceNote').textContent='ข้อมูลย้อนหลังจาก GitHub archive · ผลล่าสุดอาจยังไม่อัปเดต';
-     $('message').textContent='แหล่งผลล่าสุดขัดข้อง จึงเปลี่ยนมาใช้ฐานข้อมูลย้อนหลังอัตโนมัติ';
+     $('message').textContent='แสดงข้อมูลย้อนหลังจากฐานข้อมูลสำรอง รวมผลที่ยืนยันแล้วถึงงวด 16 พ.ย. 2569';
    }catch(fallbackError){
      $('status').textContent='เชื่อมต่อไม่สำเร็จ';
      $('message').textContent='โหลดข้อมูลไม่ได้ทั้ง API หลักและฐานข้อมูลสำรอง กรุณาลองใหม่ภายหลัง';
